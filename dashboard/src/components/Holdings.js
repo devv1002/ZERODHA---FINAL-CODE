@@ -3,10 +3,11 @@ import axios from "axios";
 
 import { VerticalGraph } from "./VerticalGraph";
 import GeneralContext from "./GeneralContext";
-import { watchlist } from "../data/data";
 
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
+  const [liveStocks, setLiveStocks] = useState([]);
+
   const generalContext = useContext(GeneralContext);
 
   useEffect(() => {
@@ -25,18 +26,41 @@ const Holdings = () => {
       });
   }, [generalContext.refreshKey]);
 
+  useEffect(() => {
+    const fetchStocks = () => {
+      axios
+        .get("http://localhost:3002/stocks", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((res) => {
+          console.log("Live stocks:", res.data);
+          setLiveStocks(res.data);
+        })
+        .catch((err) => {
+          console.log("Error fetching live stocks:", err);
+        });
+    };
+  
+    fetchStocks();
+  
+    const interval = setInterval(fetchStocks, 60000);
+  
+    return () => clearInterval(interval);
+  }, []);
   // =========================
   // GRAPH DATA
   // =========================
 
   const getLivePrice = (stock) => {
-    const liveStock = watchlist.find(
+    const liveStock = liveStocks.find(
       (item) => item.name === stock.name
     );
   
-    return liveStock ? liveStock.price : stock.price;
+    return liveStock ? Number(liveStock.price) : Number(stock.price);
   };
-  
+
   const labels = allHoldings.map((stock) => stock.name);
   
   const data = {

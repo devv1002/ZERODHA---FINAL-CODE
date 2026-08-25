@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+let yahooFinance;
+
+
 const jwt = require("jsonwebtoken");
 
 const express = require("express");
@@ -777,79 +780,89 @@ app.post("/withdraw",authenticateToken, async (req, res) => {
   }
 });
 
+
+
 // =========================
 // STOCKS / WATCHLIST
 // =========================
 
+let stocksCache = [];
+let stocksCacheTime = 0;
+
+const STOCK_CACHE_TIME = 60 * 1000; // 1 minute
+
 app.get("/stocks", authenticateToken, async (req, res) => {
   try {
-    const stocks = [
-      {
-        name: "INFY",
-        price: 1555.45,
-        percent: "-1.60%",
-        isDown: true,
-      },
-      {
-        name: "ONGC",
-        price: 116.8,
-        percent: "-0.09%",
-        isDown: true,
-      },
-      {
-        name: "TCS",
-        price: 3194.8,
-        percent: "-0.25%",
-        isDown: true,
-      },
-      {
-        name: "KPITTECH",
-        price: 300,
-        percent: "3.54%",
-        isDown: false,
-      },
-      {
-        name: "QUICKHEAL",
-        price: 308.55,
-        percent: "-0.15%",
-        isDown: true,
-      },
-      {
-        name: "WIPRO",
-        price: 577.75,
-        percent: "0.32%",
-        isDown: false,
-      },
-      {
-        name: "M&M",
-        price: 779.8,
-        percent: "-0.01%",
-        isDown: true,
-      },
-      {
-        name: "RELIANCE",
-        price: 2112.4,
-        percent: "1.44%",
-        isDown: false,
-      },
-      {
-        name: "HUL",
-        price: 512.4,
-        percent: "1.04%",
-        isDown: false,
-      },
+
+    const stockSymbols = [
+      { name: "INFY", yahoo: "INFY.NS", source: "yahoo" },
+      { name: "TCS", yahoo: "TCS.NS", source: "yahoo" },
+      { name: "WIPRO", yahoo: "WIPRO.NS", source: "yahoo" },
+      { name: "RELIANCE", yahoo: "RELIANCE.NS", source: "yahoo" },
+      { name: "HDFCBANK", yahoo: "HDFCBANK.NS", source: "yahoo" },
+      { name: "SBIN", yahoo: "SBIN.NS", source: "yahoo" },
+      { name: "ITC", yahoo: "ITC.NS", source: "yahoo" },
+      { name: "BHARTIARTL", yahoo: "BHARTIARTL.NS", source: "yahoo" },
     ];
 
-    res.json(stocks);
+    const stocks = await Promise.all(
+      stockSymbols.map(async (stock) => {
+
+        try {
+
+          // --------------------------------
+          // Other stocks → Yahoo Finance
+          // --------------------------------
+          if (!yahooFinance) {
+            const YahooFinance = (await import("yahoo-finance2")).default;
+            yahooFinance = new YahooFinance();
+          }
+          
+          const quote = await yahooFinance.quote(stock.yahoo);
+
+          const price = Number(quote.regularMarketPrice);
+          const percentChange = Number(
+            quote.regularMarketChangePercent
+          );
+
+          return {
+            name: stock.name,
+            price: Number(price.toFixed(2)),
+            percent: `${percentChange >= 0 ? "+" : ""}${percentChange.toFixed(2)}%`,
+            isDown: percentChange < 0,
+          };
+
+        } catch (error) {
+
+          console.log(
+            `Error fetching ${stock.name}:`,
+            error.message
+          );
+
+          return null;
+        }
+      })
+    );
+
+    const validStocks = stocks.filter(
+      (stock) => stock !== null
+    );
+
+    console.log("Stocks fetched successfully:", validStocks);
+
+    res.json(validStocks);
 
   } catch (err) {
+
     console.log("Stocks error:", err);
 
     res.status(500).json({
       message: "Error fetching stocks",
+      error: err.message,
     });
   }
 });
+
 
 mongoose
   .connect(uri)

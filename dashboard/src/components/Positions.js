@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
-
 import axios from "axios";
 import GeneralContext from "./GeneralContext";
-import { watchlist } from "../data/data";
 
 const Positions = () => {
   const [allPositions, setAllPositions] = useState([]);
+  const [stocks, setStocks] = useState([]);
 
   const generalContext = useContext(GeneralContext);
+
+  // =========================
+  // FETCH POSITIONS
+  // =========================
 
   useEffect(() => {
     axios
@@ -25,13 +28,43 @@ const Positions = () => {
       });
   }, [generalContext.refreshKey]);
 
+  // =========================
+  // FETCH LIVE STOCK PRICES
+  // =========================
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/stocks", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        console.log("Live stocks:", res.data);
+        setStocks(res.data);
+      })
+      .catch((err) => {
+        console.log("Error fetching stocks:", err);
+      });
+  }, []);
+
+  // =========================
+  // GET LIVE PRICE
+  // =========================
+
   const getLivePrice = (stock) => {
-    const liveStock = watchlist.find(
+    const liveStock = stocks.find(
       (item) => item.name === stock.name
     );
-  
-    return liveStock ? liveStock.price : stock.price;
+
+    return liveStock
+      ? Number(liveStock.price)
+      : Number(stock.price);
   };
+
+  // =========================
+  // UI
+  // =========================
 
   return (
     <>
@@ -55,14 +88,16 @@ const Positions = () => {
 
           <tbody>
             {allPositions.map((stock, index) => {
-
               const livePrice = getLivePrice(stock);
 
-              const curValue = livePrice * stock.qty;
+              const curValue =
+                livePrice * stock.qty;
+
+              const investment =
+                stock.avg * stock.qty;
 
               const profitLoss =
-                curValue -
-                stock.avg * stock.qty;
+                curValue - investment;
 
               const isProfit =
                 profitLoss >= 0;
@@ -87,7 +122,7 @@ const Positions = () => {
                   </td>
 
                   <td>
-                    {Number(livePrice).toFixed(2)}
+                    {livePrice.toFixed(2)}
                   </td>
 
                   <td className={profClass}>
