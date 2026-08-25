@@ -19,7 +19,7 @@ export const watchlist = [
   },
   {
     name: "KPITTECH",
-    price: 266.45,
+    price: 300,
     percent: "3.54%",
     isDown: false,
   },

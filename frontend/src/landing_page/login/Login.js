@@ -1,19 +1,17 @@
 import React, { useState } from "react";
 
-function Signup() {
-  const [username, setUsername] = useState("");
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignup = async () => {
+  const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3002/signup", {
+      const response = await fetch("http://localhost:3002/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username,
           email,
           password,
         }),
@@ -22,34 +20,35 @@ function Signup() {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Signup successful!");
+        alert("Login successful!");
 
-        // Go to login page
-        window.location.href = "/login";
+        // Store user information
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+
+        // Send JWT token to dashboard
+        window.location.href =
+          `http://localhost:3000?token=${encodeURIComponent(
+            data.token
+          )}`;
       } else {
-        alert(data.message || "Signup failed");
+        alert(data.message || "Login failed");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
       alert("Unable to connect to server");
     }
   };
 
   return (
     <div className="container text-center p-5">
-      <h1>Open a Zerodha Account</h1>
+      <h1>Login to Zerodha</h1>
 
       <p className="text-muted">
-        Start investing and trading with Zerodha.
+        Login to continue investing and trading.
       </p>
-
-      <input
-        type="text"
-        placeholder="Username"
-        className="form-control mb-3"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
 
       <input
         type="email"
@@ -69,12 +68,12 @@ function Signup() {
 
       <button
         className="btn btn-primary"
-        onClick={handleSignup}
+        onClick={handleLogin}
       >
-        Signup
+        Login
       </button>
     </div>
   );
 }
 
-export default Signup;
+export default Login;

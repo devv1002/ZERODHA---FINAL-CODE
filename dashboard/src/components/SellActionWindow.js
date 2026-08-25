@@ -4,13 +4,13 @@ import axios from "axios";
 import GeneralContext from "./GeneralContext";
 import "./BuyActionWindow.css";
 
-const BuyActionWindow = ({ uid, price }) => {
+const SellActionWindow = ({ uid, price }) => {
   const generalContext = useContext(GeneralContext);
 
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(price || 0);
 
-  const handleBuyClick = async () => {
+  const handleSellClick = async () => {
     const quantity = Number(stockQuantity);
     const orderPrice = Number(stockPrice);
 
@@ -31,7 +31,7 @@ const BuyActionWindow = ({ uid, price }) => {
           name: uid,
           qty: quantity,
           price: orderPrice,
-          mode: "BUY",
+          mode: "SELL",
         },
         {
           headers: {
@@ -40,30 +40,34 @@ const BuyActionWindow = ({ uid, price }) => {
         }
       );
 
-      alert("Buy order placed successfully!");
+      alert("Sell order placed successfully!");
 
-      generalContext.closeBuyWindow();
+      generalContext.closeSellWindow();
       generalContext.refreshData();
 
     } catch (error) {
-      console.log("Error placing buy order:", error);
+      console.log("Error placing sell order:", error);
 
       alert(
         error.response?.data?.message ||
-        "Failed to place order!"
+        "Failed to place sell order!"
       );
     }
   };
 
   const handleCancelClick = () => {
-    generalContext.closeBuyWindow();
+    generalContext.closeSellWindow();
   };
 
   const marginRequired =
     Number(stockQuantity) * Number(stockPrice);
 
   return (
-    <div className="container" id="buy-window" draggable="true">
+    <div
+      className="container"
+      id="buy-window"
+      draggable="true"
+    >
 
       <div className="regular-order">
 
@@ -110,9 +114,9 @@ const BuyActionWindow = ({ uid, price }) => {
 
           <button
             className="btn btn-blue"
-            onClick={handleBuyClick}
+            onClick={handleSellClick}
           >
-            Buy
+            Sell
           </button>
 
           <button
@@ -130,4 +134,4 @@ const BuyActionWindow = ({ uid, price }) => {
   );
 };
 
-export default BuyActionWindow;
+export default SellActionWindow;
