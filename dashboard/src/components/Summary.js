@@ -129,7 +129,7 @@ const Summary = () => {
           <div className="first">
 
           <h3>
-            ₹{equity.toFixed(2)}
+            ₹{Number(funds.balance).toFixed(2)}
           </h3>
 
             <p>Margin available</p>

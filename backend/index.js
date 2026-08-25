@@ -481,6 +481,7 @@ app.post("/newOrder",authenticateToken, async (req, res) => {
       qty: quantity,
       price: stockPrice,
       mode,
+      date: new Date(),
     });
 
     await newOrder.save();
@@ -664,8 +665,7 @@ app.get("/funds",authenticateToken, async (req, res) => {
     }
 
 
-  const availableMargin =
-  funds.balance - (funds.usedMargin || 0);
+  const availableMargin = funds.balance;
 
 res.json({
   balance: funds.balance,
