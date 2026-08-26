@@ -34,7 +34,7 @@ const Menu = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "http://localhost:3001/login";
+    window.location.href = "http://localhost:3000/login";
   };
 
   const menuClass = "menu";
