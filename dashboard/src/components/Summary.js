@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 
 import GeneralContext from "./GeneralContext";
-import { watchlist } from "../data/data";
 
 const Summary = () => {
   const [funds, setFunds] = useState({
@@ -12,6 +11,7 @@ const Summary = () => {
   });
 
   const [holdings, setHoldings] = useState([]);
+  const [liveStocks, setLiveStocks] = useState([]);
 
   const generalContext = useContext(GeneralContext);
 
@@ -66,12 +66,38 @@ const Summary = () => {
   }, [generalContext.refreshKey]);
 
 
+  useEffect(() => {
+    const fetchStocks = () => {
+      axios
+        .get("http://localhost:3002/stocks", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((res) => {
+          setLiveStocks(res.data);
+        })
+        .catch((err) => {
+          console.log("Error fetching live stocks:", err);
+        });
+    };
+  
+    fetchStocks();
+  
+    const interval = setInterval(fetchStocks, 60000);
+  
+    return () => clearInterval(interval);
+  }, []);
+
+
   const getLivePrice = (stock) => {
-    const liveStock = watchlist.find(
+    const liveStock = liveStocks.find(
       (item) => item.name === stock.name
     );
   
-    return liveStock ? liveStock.price : stock.price;
+    return liveStock
+      ? Number(liveStock.price)
+      : Number(stock.price);
   };
 
 
