@@ -794,6 +794,15 @@ const STOCK_CACHE_TIME = 60 * 1000; // 1 minute
 app.get("/stocks", authenticateToken, async (req, res) => {
   try {
 
+    const now = Date.now();
+
+    if (
+      stocksCache.length > 0 &&
+      now - stocksCacheTime < STOCK_CACHE_TIME
+    ) {
+      return res.json(stocksCache);
+    }
+
     const stockSymbols = [
       { name: "INFY", yahoo: "INFY.NS", source: "yahoo" },
       { name: "TCS", yahoo: "TCS.NS", source: "yahoo" },
@@ -847,6 +856,9 @@ app.get("/stocks", authenticateToken, async (req, res) => {
     const validStocks = stocks.filter(
       (stock) => stock !== null
     );
+
+    stocksCache = validStocks;
+    stocksCacheTime = Date.now();
 
     console.log("Stocks fetched successfully:", validStocks);
 
