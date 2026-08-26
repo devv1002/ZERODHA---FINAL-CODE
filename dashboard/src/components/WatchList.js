@@ -21,19 +21,30 @@ const WatchList = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3002/stocks", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        console.log("Stocks:", res.data);
-        setWatchlist(res.data);
-      })
-      .catch((err) => {
-        console.log("Error fetching stocks:", err);
-      });
+    const fetchStocks = () => {
+      axios
+        .get("http://localhost:3002/stocks", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((res) => {
+          console.log("Stocks:", res.data);
+          setWatchlist(res.data);
+        })
+        .catch((err) => {
+          console.log("Error fetching stocks:", err);
+        });
+    };
+  
+    // Fetch immediately
+    fetchStocks();
+  
+    // Refresh every 5 seconds
+    const interval = setInterval(fetchStocks, 5000);
+  
+    // Cleanup when component is removed
+    return () => clearInterval(interval);
   }, []);
 
   const filteredWatchlist = watchlist.filter((stock) =>

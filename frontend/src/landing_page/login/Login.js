@@ -30,7 +30,7 @@ function Login() {
 
         // Send JWT token to dashboard
         window.location.href =
-          `http://localhost:3000?token=${encodeURIComponent(
+          `http://localhost:3001?token=${encodeURIComponent(
             data.token
           )}`;
       } else {

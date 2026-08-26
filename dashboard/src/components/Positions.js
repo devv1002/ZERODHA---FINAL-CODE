@@ -33,21 +33,29 @@ const Positions = () => {
   // =========================
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3002/stocks", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        console.log("Live stocks:", res.data);
-        setStocks(res.data);
-      })
-      .catch((err) => {
-        console.log("Error fetching stocks:", err);
-      });
+    const fetchStocks = () => {
+      axios
+        .get("http://localhost:3002/stocks", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((res) => {
+          console.log("Live stocks:", res.data);
+          setStocks(res.data);
+        })
+        .catch((err) => {
+          console.log("Error fetching stocks:", err);
+        });
+    };
+  
+    fetchStocks();
+  
+    const interval = setInterval(fetchStocks, 60000);
+  
+    return () => clearInterval(interval);
   }, []);
-
+  
   // =========================
   // GET LIVE PRICE
   // =========================

@@ -41,7 +41,7 @@ const ProtectedRoute = ({ children }) => {
 
   if (!token) {
     window.location.href =
-      "http://localhost:3001/login";
+      "http://localhost:3000/login";
 
     return null;
   }
