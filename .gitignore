@@ -1,3 +1,17 @@
-node_modules/
+# Environment variables
+backend/.env
 .env
+
+# Node modules
+node_modules/
+backend/node_modules/
+dashboard/node_modules/
+
+# React build
+dashboard/build/
+
+# Logs
+*.log
+
+# macOS
 .DS_Store
