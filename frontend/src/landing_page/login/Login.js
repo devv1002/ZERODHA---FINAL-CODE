@@ -6,7 +6,7 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3002/login", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +30,7 @@ function Login() {
 
         // Send JWT token to dashboard
         window.location.href =
-          `http://localhost:3001?token=${encodeURIComponent(
+          `https://zerodha-dashboard-spuu.onrender.com?token=${encodeURIComponent(
             data.token
           )}`;
       } else {
