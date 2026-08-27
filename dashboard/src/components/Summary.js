@@ -4,132 +4,138 @@ import axios from "axios";
 import GeneralContext from "./GeneralContext";
 
 const Summary = () => {
+  const generalContext = useContext(GeneralContext);
+
+  const [dashboard, setDashboard] = useState({
+    totalInvestment: 0,
+    currentValue: 0,
+    profitLoss: 0,
+    holdingsCount: 0,
+    ordersCount: 0,
+    balance: 0,
+  });
+
   const [funds, setFunds] = useState({
     balance: 0,
     usedMargin: 0,
     openingBalance: 0,
   });
 
-  const [holdings, setHoldings] = useState([]);
-  const [liveStocks, setLiveStocks] = useState([]);
+  const [username, setUsername] = useState("User");
 
-  const generalContext = useContext(GeneralContext);
+  // =========================
+  // GET USERNAME FROM TOKEN
+  // =========================
 
-  const token = localStorage.getItem("token");
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
-  let username = "User";
+    if (!token) return;
 
-  if (token) {
     try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      username = payload.username;
+      const payload = JSON.parse(
+        atob(token.split(".")[1])
+      );
+
+      setUsername(payload.username || "User");
+
     } catch (error) {
       console.log("Invalid token");
     }
-  }
+  }, []);
+
+  // =========================
+  // FETCH DASHBOARD DATA
+  // =========================
+
+  const fetchDashboard = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(
+        "http://localhost:3002/dashboard",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Dashboard data:", res.data);
+
+      setDashboard(res.data);
+
+    } catch (error) {
+      console.log(
+        "Error fetching dashboard:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
   // =========================
   // FETCH FUNDS
   // =========================
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:3002/funds", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        setFunds(res.data);
-      })
-      .catch((err) => {
-        console.log("Error fetching funds:", err);
-      });
-  }, [generalContext.refreshKey]);
+  const fetchFunds = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-  // =========================
-  // FETCH HOLDINGS
-  // =========================
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3002/allHoldings", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        setHoldings(res.data);
-      })
-      .catch((err) => {
-        console.log("Error fetching holdings:", err);
-      });
-  }, [generalContext.refreshKey]);
-
-
-  useEffect(() => {
-    const fetchStocks = () => {
-      axios
-        .get("http://localhost:3002/stocks", {
+      const res = await axios.get(
+        "http://localhost:3002/funds",
+        {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
-        })
-        .then((res) => {
-          setLiveStocks(res.data);
-        })
-        .catch((err) => {
-          console.log("Error fetching live stocks:", err);
-        });
-    };
-  
-    fetchStocks();
-  
-    const interval = setInterval(fetchStocks, 60000);
-  
-    return () => clearInterval(interval);
-  }, []);
+        }
+      );
 
+      console.log("Funds data:", res.data);
 
-  const getLivePrice = (stock) => {
-    const liveStock = liveStocks.find(
-      (item) => item.name === stock.name
-    );
-  
-    return liveStock
-      ? Number(liveStock.price)
-      : Number(stock.price);
+      setFunds(res.data);
+
+    } catch (error) {
+      console.log(
+        "Error fetching funds:",
+        error.response?.data || error.message
+      );
+    }
   };
 
+  // =========================
+  // FETCH DATA
+  // =========================
+
+  useEffect(() => {
+    fetchDashboard();
+    fetchFunds();
+  }, [generalContext.refreshKey]);
 
   // =========================
-  // HOLDINGS CALCULATIONS
+  // CALCULATIONS
   // =========================
 
-  const investment = holdings.reduce(
-    (total, stock) => {
-      return total + stock.avg * stock.qty;
-    },
-    0
+  const profitLoss = Number(
+    dashboard.profitLoss || 0
   );
 
-  const currentValue = holdings.reduce(
-  (total, stock) => {
-    return total + getLivePrice(stock) * stock.qty;
-  },
-  0
-);
+  const investment = Number(
+    dashboard.totalInvestment || 0
+  );
 
-  const profitLoss = currentValue - investment;
+  const currentValue = Number(
+    dashboard.currentValue || 0
+  );
 
   const profitLossPercentage =
     investment > 0
       ? (profitLoss / investment) * 100
       : 0;
 
-  const equity = funds.balance + currentValue;
-
   const profitClass =
-    profitLoss >= 0 ? "profit" : "loss";
+    profitLoss >= 0
+      ? "profit"
+      : "loss";
 
   // =========================
   // UI
@@ -137,12 +143,21 @@ const Summary = () => {
 
   return (
     <>
+      {/* =========================
+          USER
+      ========================= */}
+
       <div className="username">
-        <h6>Hi, {username}!</h6>
+        <h6>
+          Hi, {username}!
+        </h6>
+
         <hr className="divider" />
       </div>
 
-      {/* EQUITY */}
+      {/* =========================
+          EQUITY
+      ========================= */}
 
       <div className="section">
 
@@ -154,11 +169,16 @@ const Summary = () => {
 
           <div className="first">
 
-          <h3>
-            ₹{Number(funds.balance).toFixed(2)}
-          </h3>
+            <h3>
+              ₹
+              {Number(
+                funds.balance
+              ).toFixed(2)}
+            </h3>
 
-            <p>Margin available</p>
+            <p>
+              Margin available
+            </p>
 
           </div>
 
@@ -169,14 +189,20 @@ const Summary = () => {
             <p>
               Margins used{" "}
               <span>
-                ₹{Number(funds.usedMargin).toFixed(2)}
+                ₹
+                {Number(
+                  funds.usedMargin
+                ).toFixed(2)}
               </span>
             </p>
 
             <p>
               Opening balance{" "}
               <span>
-                ₹{Number(funds.openingBalance).toFixed(2)}
+                ₹
+                {Number(
+                  funds.openingBalance
+                ).toFixed(2)}
               </span>
             </p>
 
@@ -188,13 +214,15 @@ const Summary = () => {
 
       </div>
 
-      {/* HOLDINGS */}
+      {/* =========================
+          HOLDINGS
+      ========================= */}
 
       <div className="section">
 
         <span>
           <p>
-            Holdings ({holdings.length})
+            Holdings ({dashboard.holdingsCount})
           </p>
         </span>
 
@@ -205,18 +233,30 @@ const Summary = () => {
             <h3 className={profitClass}>
 
               ₹
-              {profitLoss >= 0 ? "+" : ""}
+              {profitLoss >= 0
+                ? "+"
+                : ""}
+
               {profitLoss.toFixed(2)}
 
               <small>
+
                 {" "}
-                {profitLoss >= 0 ? "+" : ""}
-                {profitLossPercentage.toFixed(2)}%
+
+                {profitLoss >= 0
+                  ? "+"
+                  : ""}
+
+                {profitLossPercentage.toFixed(2)}
+                %
+
               </small>
 
             </h3>
 
-            <p>P&L</p>
+            <p>
+              P&L
+            </p>
 
           </div>
 
@@ -227,14 +267,64 @@ const Summary = () => {
             <p>
               Current Value{" "}
               <span>
-                ₹{currentValue.toFixed(2)}
+                ₹
+                {currentValue.toFixed(2)}
               </span>
             </p>
 
             <p>
               Investment{" "}
               <span>
-                ₹{investment.toFixed(2)}
+                ₹
+                {investment.toFixed(2)}
+              </span>
+            </p>
+
+          </div>
+
+        </div>
+
+        <hr className="divider" />
+
+      </div>
+
+      {/* =========================
+          TRADING SUMMARY
+      ========================= */}
+
+      <div className="section">
+
+        <span>
+          <p>
+            Trading overview
+          </p>
+        </span>
+
+        <div className="data">
+
+          <div className="second">
+
+            <p>
+              Total orders{" "}
+              <span>
+                {dashboard.ordersCount}
+              </span>
+            </p>
+
+            <p>
+              Holdings{" "}
+              <span>
+                {dashboard.holdingsCount}
+              </span>
+            </p>
+
+            <p>
+              Available funds{" "}
+              <span>
+                ₹
+                {Number(
+                  funds.balance
+                ).toFixed(2)}
               </span>
             </p>
 
