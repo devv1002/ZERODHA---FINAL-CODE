@@ -34,7 +34,7 @@ const Menu = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    window.location.href = "http://localhost:3000/login";
+    window.location.href = "https://zerodha-frontend-46x5.onrender.com/login";
   };
 
   const menuClass = "menu";

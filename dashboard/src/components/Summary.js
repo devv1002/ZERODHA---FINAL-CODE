@@ -53,7 +53,7 @@ const Summary = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:3002/dashboard",
+        `${process.env.REACT_APP_API_URL}/dashboard`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const Summary = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:3002/funds",
+        `${process.env.REACT_APP_API_URL}/funds`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

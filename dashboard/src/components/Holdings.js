@@ -12,7 +12,7 @@ const Holdings = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3002/allHoldings", {
+      .get(`${process.env.REACT_APP_API_URL}/allHoldings`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -29,7 +29,7 @@ const Holdings = () => {
   useEffect(() => {
     const fetchStocks = () => {
       axios
-        .get("http://localhost:3002/stocks", {
+        .get(`${process.env.REACT_APP_API_URL}/stocks`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },

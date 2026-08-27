@@ -27,7 +27,7 @@ const Funds = () => {
   const fetchFunds = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:3002/funds",{
+        `${process.env.REACT_APP_API_URL}/funds`,{
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -67,7 +67,7 @@ const Funds = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:3002/addFunds",
+        `${process.env.REACT_APP_API_URL}/addfunds`,
         {
           amount: Number(amount),
         },{
@@ -105,7 +105,7 @@ const Funds = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:3002/withdraw",
+        `${process.env.REACT_APP_API_URL}/withdraw`,
         {
           amount: Number(amount),
         },

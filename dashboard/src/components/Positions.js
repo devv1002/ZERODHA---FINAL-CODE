@@ -14,7 +14,7 @@ const Positions = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3002/allPositions", {
+      .get(`${process.env.REACT_APP_API_URL}/allPositions`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -35,7 +35,7 @@ const Positions = () => {
   useEffect(() => {
     const fetchStocks = () => {
       axios
-        .get("http://localhost:3002/stocks", {
+        .get(`${process.env.REACT_APP_API_URL}/stocks`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
