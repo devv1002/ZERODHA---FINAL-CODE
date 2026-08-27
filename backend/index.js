@@ -793,6 +793,7 @@ const STOCK_CACHE_TIME = 60 * 1000; // 1 minute
 
 app.get("/stocks", authenticateToken, async (req, res) => {
   try {
+    
 
     const now = Date.now();
 
@@ -861,7 +862,6 @@ app.get("/stocks", authenticateToken, async (req, res) => {
     stocksCacheTime = Date.now();
 
     console.log("Stocks fetched successfully:", validStocks);
-
     res.json(validStocks);
 
   } catch (err) {
