@@ -840,6 +840,11 @@ app.get("/stocks", authenticateToken, async (req, res) => {
             price: Number(price.toFixed(2)),
             percent: `${percentChange >= 0 ? "+" : ""}${percentChange.toFixed(2)}%`,
             isDown: percentChange < 0,
+          
+            // Previous closing price
+            previousClose: Number(
+              quote.regularMarketPreviousClose?.toFixed(2)
+            ),
           };
 
         } catch (error) {

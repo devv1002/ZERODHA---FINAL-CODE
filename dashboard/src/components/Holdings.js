@@ -61,17 +61,31 @@ const Holdings = () => {
     return liveStock ? Number(liveStock.price) : Number(stock.price);
   };
 
+  const getLiveStock = (stock) => {
+    return liveStocks.find(
+      (item) => item.name === stock.name
+    );
+  };
+
   const labels = allHoldings.map((stock) => stock.name);
   
   const data = {
     labels,
     datasets: [
       {
-        label: "Stock Price",
-        data: allHoldings.map((stock) =>
-          getLivePrice(stock)
+        label: "Portfolio Allocation",
+        data: allHoldings.map(
+          (stock) =>
+            getLivePrice(stock) * stock.qty
         ),
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 206, 86, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+          "rgba(153, 102, 255, 0.5)",
+          "rgba(255, 159, 64, 0.5)",
+        ],
       },
     ],
   };
@@ -146,6 +160,22 @@ const Holdings = () => {
                 curValue -
                 stock.avg * stock.qty;
 
+              const liveStock = getLiveStock(stock);
+
+                // Actual return on this holding
+              const netChangePercentage =
+                stock.avg > 0
+                  ? ((livePrice - stock.avg) / stock.avg) * 100
+                  : 0;
+              
+              const netChange =
+                `${netChangePercentage >= 0 ? "+" : ""}${netChangePercentage.toFixed(2)}%`;
+              
+              // Today's market movement
+              const dayChange =
+                liveStock?.percent || stock.day || "0.00%";
+
+
               const isProfit =
                 profitLoss >= 0;
 
@@ -182,12 +212,24 @@ const Holdings = () => {
                     {profitLoss.toFixed(2)}
                   </td>
 
-                  <td className={profClass}>
-                    {stock.net}
+                  <td
+                    className={
+                      netChange.startsWith("-")
+                        ? "loss"
+                        : "profit"
+                    }
+                  >
+                    {netChange}
                   </td>
 
-                  <td className={dayClass}>
-                    {stock.day}
+                  <td
+                    className={
+                      dayChange.startsWith("-")
+                        ? "loss"
+                        : "profit"
+                    }
+                  >
+                    {dayChange}
                   </td>
                 </tr>
               );

@@ -70,6 +70,12 @@ const Positions = () => {
       : Number(stock.price);
   };
 
+  const getLiveStock = (stock) => {
+    return stocks.find(
+      (item) => item.name === stock.name
+    );
+  };
+
   // =========================
   // UI
   // =========================
@@ -107,6 +113,11 @@ const Positions = () => {
               const profitLoss =
                 curValue - investment;
 
+              const liveStock = getLiveStock(stock);
+
+              const dayChange =
+                liveStock?.percent || stock.day || "0.00%";
+
               const isProfit =
                 profitLoss >= 0;
 
@@ -114,8 +125,11 @@ const Positions = () => {
                 isProfit ? "profit" : "loss";
 
               const dayClass =
-                stock.isLoss ? "loss" : "profit";
+                dayChange.startsWith("-")
+                  ? "loss"
+                  : "profit";
 
+              
               return (
                 <tr key={stock._id || index}>
 
@@ -139,7 +153,7 @@ const Positions = () => {
                   </td>
 
                   <td className={dayClass}>
-                    {stock.day}
+                    {dayChange}
                   </td>
 
                 </tr>
