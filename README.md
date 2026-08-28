@@ -1,3 +1,11 @@
+## 🚀 Live Demo
+
+- **Frontend:** https://zerodha-dashboard-spuu.onrender.com
+- **Backend API:** https://zerodha-backend-8cq4.onrender.com
+
+> The backend is hosted on Render and may take a few seconds to wake up if inactive.
+
+
 # Zerodha Stock Trading Platform
 
 A full-stack stock trading dashboard inspired by Zerodha, built to simulate stock trading with user authentication, live market prices, order management, holdings, positions, and funds management.
@@ -21,6 +29,23 @@ A full-stack stock trading dashboard inspired by Zerodha, built to simulate stoc
 - MongoDB Database Integration
 - Automatic Dashboard Updates
 - Logout Functionality
+
+## ✨ Key Features
+
+- User Signup and Login
+- JWT-based Authentication
+- Live Stock Market Prices
+- Buy and Sell Stocks
+- Order Management
+- Holdings Management
+- Positions Tracking
+- Funds Management
+- Add Funds and Withdraw Funds
+- User-specific Trading Data
+- MongoDB Database Integration
+- Automatic Dashboard Updates
+- Secure Password Hashing using bcrypt
+- Responsive Trading Dashboard
 
 ## 🛠️ Tech Stack
 
@@ -65,3 +90,21 @@ ZERODHA
 │
 ├── .gitignore
 └── README.md
+
+## 🌐 Deployment
+
+The application is deployed using Render.
+
+### Services
+
+- Frontend: Render Static Site
+- Backend: Render Web Service
+- Database: MongoDB Atlas
+
+### Production URLs
+
+Frontend:
+https://zerodha-dashboard-spuu.onrender.com
+
+Backend:
+https://zerodha-backend-8cq4.onrender.com
