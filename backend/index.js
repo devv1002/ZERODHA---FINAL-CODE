@@ -786,10 +786,76 @@ app.post("/withdraw",authenticateToken, async (req, res) => {
 // STOCKS / WATCHLIST
 // =========================
 
-let stocksCache = {};
+// let stocksCache = {};
+// let stocksCacheTime = 0;
+
+// const STOCK_CACHE_TIME = 60 * 1000; // 1 minute
+
+let stocksCache = {
+  INFY: {
+    name: "INFY",
+    price: 1144,
+    percent: "+2.99%",
+    isDown: false,
+    previousClose: 1110.8,
+  },
+
+  TCS: {
+    name: "TCS",
+    price: 2342,
+    percent: "+4.16%",
+    isDown: false,
+    previousClose: 2248.4,
+  },
+
+  WIPRO: {
+    name: "WIPRO",
+    price: 180.95,
+    percent: "+2.58%",
+    isDown: false,
+    previousClose: 176.4,
+  },
+
+  RELIANCE: {
+    name: "RELIANCE",
+    price: 1287,
+    percent: "+0.37%",
+    isDown: false,
+    previousClose: 1282.2,
+  },
+
+  HDFCBANK: {
+    name: "HDFCBANK",
+    price: 720.3,
+    percent: "+1.31%",
+    isDown: false,
+  },
+
+  SBIN: {
+    name: "SBIN",
+    price: 1047.5,
+    percent: "+0.44%",
+    isDown: false,
+  },
+
+  ITC: {
+    name: "ITC",
+    price: 266,
+    percent: "-1.12%",
+    isDown: true,
+  },
+
+  BHARTIARTL: {
+    name: "BHARTIARTL",
+    price: 1882.4,
+    percent: "+0.22%",
+    isDown: false,
+  },
+};
+
 let stocksCacheTime = 0;
 
-const STOCK_CACHE_TIME = 60 * 1000; // 1 minute
+const STOCK_CACHE_TIME = 60 * 1000;
 
 app.get("/stocks", authenticateToken, async (req, res) => {
   try {
