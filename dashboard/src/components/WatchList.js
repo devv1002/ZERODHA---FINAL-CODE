@@ -41,7 +41,7 @@ const WatchList = () => {
     fetchStocks();
   
     // Refresh every 5 seconds
-    const interval = setInterval(fetchStocks, 5000);
+    const interval = setInterval(fetchStocks, 60000);
   
     // Cleanup when component is removed
     return () => clearInterval(interval);

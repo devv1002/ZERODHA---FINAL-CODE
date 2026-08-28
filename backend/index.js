@@ -793,10 +793,9 @@ const STOCK_CACHE_TIME = 60 * 1000; // 1 minute
 
 app.get("/stocks", authenticateToken, async (req, res) => {
   try {
-    
-
     const now = Date.now();
 
+    // Return cached stocks if cache is still valid
     if (
       stocksCache.length > 0 &&
       now - stocksCacheTime < STOCK_CACHE_TIME
@@ -805,72 +804,71 @@ app.get("/stocks", authenticateToken, async (req, res) => {
     }
 
     const stockSymbols = [
-      { name: "INFY", yahoo: "INFY.NS", source: "yahoo" },
-      { name: "TCS", yahoo: "TCS.NS", source: "yahoo" },
-      { name: "WIPRO", yahoo: "WIPRO.NS", source: "yahoo" },
-      { name: "RELIANCE", yahoo: "RELIANCE.NS", source: "yahoo" },
-      { name: "HDFCBANK", yahoo: "HDFCBANK.NS", source: "yahoo" },
-      { name: "SBIN", yahoo: "SBIN.NS", source: "yahoo" },
-      { name: "ITC", yahoo: "ITC.NS", source: "yahoo" },
-      { name: "BHARTIARTL", yahoo: "BHARTIARTL.NS", source: "yahoo" },
+      { name: "INFY", yahoo: "INFY.NS" },
+      { name: "TCS", yahoo: "TCS.NS" },
+      { name: "WIPRO", yahoo: "WIPRO.NS" },
+      { name: "RELIANCE", yahoo: "RELIANCE.NS" },
+      { name: "HDFCBANK", yahoo: "HDFCBANK.NS" },
+      { name: "SBIN", yahoo: "SBIN.NS" },
+      { name: "ITC", yahoo: "ITC.NS" },
+      { name: "BHARTIARTL", yahoo: "BHARTIARTL.NS" },
     ];
 
-    const stocks = await Promise.all(
-      stockSymbols.map(async (stock) => {
+    // Initialize Yahoo Finance once
+    if (!yahooFinance) {
+      const YahooFinance = (await import("yahoo-finance2")).default;
+      yahooFinance = new YahooFinance();
+    }
 
-        try {
+    // ONE request for all stocks
+    const quotes = await yahooFinance.quote(
+      stockSymbols.map((stock) => stock.yahoo)
+    );
 
-          // --------------------------------
-          // Other stocks → Yahoo Finance
-          // --------------------------------
-          if (!yahooFinance) {
-            const YahooFinance = (await import("yahoo-finance2")).default;
-            yahooFinance = new YahooFinance();
-          }
-          
-          const quote = await yahooFinance.quote(stock.yahoo);
+    console.log("Yahoo quotes received:", quotes.length);
 
-          const price = Number(quote.regularMarketPrice);
-          const percentChange = Number(
-            quote.regularMarketChangePercent
-          );
+    // Convert Yahoo response into our frontend format
+    const stocks = stockSymbols
+      .map((stock) => {
+        const quote = quotes.find(
+          (q) => q.symbol === stock.yahoo
+        );
 
-          return {
-            name: stock.name,
-            price: Number(price.toFixed(2)),
-            percent: `${percentChange >= 0 ? "+" : ""}${percentChange.toFixed(2)}%`,
-            isDown: percentChange < 0,
-          
-            // Previous closing price
-            previousClose: Number(
-              quote.regularMarketPreviousClose?.toFixed(2)
-            ),
-          };
-
-        } catch (error) {
-
-          console.log(
-            `Error fetching ${stock.name}:`,
-            error.message
-          );
-
+        if (!quote) {
           return null;
         }
+
+        const price = Number(quote.regularMarketPrice);
+        const percentChange = Number(
+          quote.regularMarketChangePercent
+        );
+
+        if (!Number.isFinite(price)) {
+          return null;
+        }
+
+        return {
+          name: stock.name,
+          price: Number(price.toFixed(2)),
+          percent: `${
+            percentChange >= 0 ? "+" : ""
+          }${percentChange.toFixed(2)}%`,
+          isDown: percentChange < 0,
+          previousClose: Number(
+            quote.regularMarketPreviousClose?.toFixed(2)
+          ),
+        };
       })
-    );
+      .filter((stock) => stock !== null);
 
-    const validStocks = stocks.filter(
-      (stock) => stock !== null
-    );
-
-    stocksCache = validStocks;
+    stocksCache = stocks;
     stocksCacheTime = Date.now();
 
-    console.log("Stocks fetched successfully:", validStocks);
-    res.json(validStocks);
+    console.log("Stocks fetched successfully:", stocks);
+
+    res.json(stocks);
 
   } catch (err) {
-
     console.log("Stocks error:", err);
 
     res.status(500).json({
