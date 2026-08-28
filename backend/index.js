@@ -814,40 +814,51 @@ app.get("/stocks", authenticateToken, async (req, res) => {
       { name: "BHARTIARTL", yahoo: "BHARTIARTL.NS" },
     ];
 
-    // Initialize Yahoo Finance once
-    if (!yahooFinance) {
-      const YahooFinance = (await import("yahoo-finance2")).default;
-      yahooFinance = new YahooFinance();
-    }
+    const stocks = [];
 
-    // ONE request for all stocks
-    const quotes = await yahooFinance.quote(
-      stockSymbols.map((stock) => stock.yahoo)
-    );
+    for (const stock of stockSymbols) {
+      try {
+        const url =
+          `https://query1.finance.yahoo.com/v8/finance/chart/${stock.yahoo}` +
+          `?interval=1d&range=2d`;
 
-    console.log("Yahoo quotes received:", quotes.length);
+        const response = await fetch(url);
 
-    // Convert Yahoo response into our frontend format
-    const stocks = stockSymbols
-      .map((stock) => {
-        const quote = quotes.find(
-          (q) => q.symbol === stock.yahoo
-        );
-
-        if (!quote) {
-          return null;
+        if (!response.ok) {
+          throw new Error(
+            `Yahoo API returned ${response.status}`
+          );
         }
 
-        const price = Number(quote.regularMarketPrice);
-        const percentChange = Number(
-          quote.regularMarketChangePercent
+        const data = await response.json();
+
+        const result = data?.chart?.result?.[0];
+
+        if (!result) {
+          throw new Error("No Yahoo data received");
+        }
+
+        const meta = result.meta;
+
+        const price = Number(
+          meta.regularMarketPrice
+        );
+
+        const previousClose = Number(
+          meta.previousClose ||
+          meta.chartPreviousClose
         );
 
         if (!Number.isFinite(price)) {
-          return null;
+          throw new Error("Invalid stock price");
         }
 
-        return {
+        const percentChange =
+          previousClose
+            ? ((price - previousClose) / previousClose) * 100
+            : 0;
+
+        stocks.push({
           name: stock.name,
           price: Number(price.toFixed(2)),
           percent: `${
@@ -855,21 +866,38 @@ app.get("/stocks", authenticateToken, async (req, res) => {
           }${percentChange.toFixed(2)}%`,
           isDown: percentChange < 0,
           previousClose: Number(
-            quote.regularMarketPreviousClose?.toFixed(2)
+            previousClose.toFixed(2)
           ),
-        };
-      })
-      .filter((stock) => stock !== null);
+        });
 
-    stocksCache = stocks;
-    stocksCacheTime = Date.now();
+      } catch (error) {
+        console.log(
+          `Error fetching ${stock.name}:`,
+          error.message
+        );
+      }
+    }
 
-    console.log("Stocks fetched successfully:", stocks);
+    // Only update cache if we actually received stocks
+    if (stocks.length > 0) {
+      stocksCache = stocks;
+      stocksCacheTime = Date.now();
+    }
+
+    console.log(
+      `Stocks fetched successfully: ${stocks.length}`
+    );
 
     res.json(stocks);
 
   } catch (err) {
     console.log("Stocks error:", err);
+
+    // If Yahoo fails but old cache exists,
+    // return the old data instead of 500
+    if (stocksCache.length > 0) {
+      return res.json(stocksCache);
+    }
 
     res.status(500).json({
       message: "Error fetching stocks",
