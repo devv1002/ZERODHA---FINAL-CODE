@@ -1,110 +1,119 @@
-## 🚀 Live Demo
-
-- **Frontend:** https://zerodha-dashboard-spuu.onrender.com
-- **Backend API:** https://zerodha-backend-8cq4.onrender.com
-
-> The backend is hosted on Render and may take a few seconds to wake up if inactive.
-
-
 # Zerodha Stock Trading Platform
 
-A full-stack stock trading dashboard inspired by Zerodha, built to simulate stock trading with user authentication, live market prices, order management, holdings, positions, and funds management.
+A full-stack stock trading platform inspired by Zerodha, built to simulate stock market trading with user authentication, live market prices, watchlist management, order management, holdings, positions, and funds management.
 
-## 🚀 Features
+## 🚀 Live Demo
 
-- User Signup and Login
-- JWT-based Authentication
-- Secure Password Hashing with bcrypt
-- Live Stock Market Prices
-- Stock Watchlist
-- Buy and Sell Stocks
-- Order History
-- Holdings Management
-- Positions Tracking
-- Real-time Profit & Loss Calculation
-- Funds Management
-- Add Funds
-- Withdraw Funds
-- User-specific Trading Data
-- MongoDB Database Integration
-- Automatic Dashboard Updates
-- Logout Functionality
+- **Trading Dashboard:** https://zerodha-dashboard-spuu.onrender.com
+- **Backend API:** https://zerodha-backend-8cg4.onrender.com
 
-## ✨ Key Features
+> The application is deployed on Render. Free-tier services may take a few seconds to wake up after inactivity.
 
-- User Signup and Login
-- JWT-based Authentication
-- Live Stock Market Prices
-- Buy and Sell Stocks
-- Order Management
-- Holdings Management
-- Positions Tracking
-- Funds Management
-- Add Funds and Withdraw Funds
-- User-specific Trading Data
-- MongoDB Database Integration
-- Automatic Dashboard Updates
-- Secure Password Hashing using bcrypt
-- Responsive Trading Dashboard
+## ✨ Features
 
-## 🛠️ Tech Stack
+### 🔐 Authentication
+
+- User signup and login
+- JWT-based authentication
+- Secure password hashing using bcrypt
+- Protected API routes
+- User-specific trading data
+- Logout functionality
+
+### 📈 Market Data
+
+- Live stock market prices
+- Stock watchlist
+- Market price updates using Yahoo Finance
+- Support for multiple Indian stocks
+
+### 💹 Trading
+
+- Buy stocks
+- Sell stocks
+- Order validation
+- Order history
+- User-specific orders
+- Automatic holdings and positions updates
+
+### 💰 Portfolio Management
+
+- Holdings tracking
+- Positions tracking
+- Average purchase price calculation
+- Current market value
+- Profit & Loss calculation
+- Daily market movement
+- Portfolio summary
+
+### 💵 Funds Management
+
+- Available balance tracking
+- Add funds
+- Withdraw funds
+- Automatic balance updates
+- User-specific funds
+
+### 🖥️ Dashboard
+
+- Zerodha-inspired interface
+- Watchlist
+- Dashboard summary
+- Orders
+- Holdings
+- Positions
+- Funds
+- Buy/Sell action windows
+- Responsive UI
+
+## ��️ Tech Stack
 
 ### Frontend
+
 - React.js
 - React Router
 - Axios
 - JavaScript
-- HTML
-- CSS
+- HTML5
+- CSS3
 
 ### Backend
+
 - Node.js
 - Express.js
 - MongoDB
 - Mongoose
 - JWT
 - bcrypt
-- Axios
 
-### APIs
-- Yahoo Finance API for live stock prices
+### Market Data
 
-## 📂 Project Structure
+- Yahoo Finance
+
+### Deployment
+
+- Render
+- MongoDB Atlas
+
+## 🏗️ Application Architecture
 
 ```text
-ZERODHA
-│
-├── backend
-│   ├── model
-│   ├── schemas
-│   ├── index.js
-│   ├── package.json
-│   └── .env
-│
-├── dashboard
-│   ├── src
-│   │   └── components
-│   └── package.json
-│
-├── frontend
-│
-├── .gitignore
-└── README.md
-
-## 🌐 Deployment
-
-The application is deployed using Render.
-
-### Services
-
-- Frontend: Render Static Site
-- Backend: Render Web Service
-- Database: MongoDB Atlas
-
-### Production URLs
-
-Frontend:
-https://zerodha-dashboard-spuu.onrender.com
-
-Backend:
-https://zerodha-backend-8cq4.onrender.com
+                    ┌─────────────────────┐
+                    │      React UI       │
+                    │     Dashboard       │
+                    └──────────┬──────────┘
+                               │
+                               │ Axios / REST API
+                               ▼
+                    ┌─────────────────────┐
+                    │   Node.js +         │
+                    │   Express Backend   │
+                    └───────┬─────┬───────┘
+                            │       │
+                 ┌──────────┘       └─────────────┐
+                 ▼                                ▼
+        ┌─────────────────┐             ┌─────────────────┐
+        │   MongoDB Atlas │             │   Yahoo Finance │
+        │   User & Trade  │             │   Market Data   │
+        │      Data       │             └─────────────────┘
+        └─────────────────┘
