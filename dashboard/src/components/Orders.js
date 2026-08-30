@@ -26,8 +26,6 @@ const Orders = () => {
           }
         );
 
-        console.log("Orders data:", res.data);
-
         // Newest orders first
         const sortedOrders = [...res.data].sort(
           (a, b) =>

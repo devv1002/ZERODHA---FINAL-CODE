@@ -61,8 +61,6 @@ const Summary = () => {
         }
       );
 
-      console.log("Dashboard data:", res.data);
-
       setDashboard(res.data);
 
     } catch (error) {
@@ -89,8 +87,6 @@ const Summary = () => {
           },
         }
       );
-
-      console.log("Funds data:", res.data);
 
       setFunds(res.data);
 

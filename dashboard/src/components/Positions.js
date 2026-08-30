@@ -20,7 +20,6 @@ const Positions = () => {
         },
       })
       .then((res) => {
-        console.log("Positions data:", res.data);
         setAllPositions(res.data);
       })
       .catch((err) => {
@@ -41,7 +40,6 @@ const Positions = () => {
           },
         })
         .then((res) => {
-          console.log("Live stocks:", res.data);
           setStocks(res.data);
         })
         .catch((err) => {

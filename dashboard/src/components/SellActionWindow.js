@@ -46,8 +46,6 @@ const SellActionWindow = ({ uid, price }) => {
       generalContext.refreshData();
 
     } catch (error) {
-      console.log("Error placing sell order:", error);
-
       alert(
         error.response?.data?.message ||
         "Failed to place sell order!"

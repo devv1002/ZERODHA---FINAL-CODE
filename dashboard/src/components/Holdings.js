@@ -18,7 +18,6 @@ const Holdings = () => {
         },
       })
       .then((res) => {
-        console.log("Holdings data:", res.data);
         setAllHoldings(res.data);
       })
       .catch((err) => {
@@ -35,7 +34,6 @@ const Holdings = () => {
           },
         })
         .then((res) => {
-          console.log("Live stocks:", res.data);
           setLiveStocks(res.data);
         })
         .catch((err) => {
@@ -182,10 +180,6 @@ const Holdings = () => {
               const profClass =
                 isProfit ? "profit" : "loss";
 
-              const dayClass =
-                stock.day?.startsWith("-")
-                  ? "loss"
-                  : "profit";
 
               return (
                 <tr

@@ -29,7 +29,6 @@ const WatchList = () => {
           },
         })
         .then((res) => {
-          console.log("Stocks:", res.data);
           setWatchlist(res.data);
         })
         .catch((err) => {
@@ -96,7 +95,6 @@ const WatchList = () => {
           className="search"
           placeholder="Search eg:infy, bse, nifty fut weekly, gold mcx"
           onChange={(e) => {
-            console.log("TYPED:", e.target.value);
             setSearchTerm(e.target.value);
           }}
         />
@@ -199,13 +197,11 @@ const WatchListActions = ({ uid, price }) => {
 
   // BUY
   const handleBuyClick = () => {
-    console.log("BUY CLICKED:", uid, price);
     generalContext.openBuyWindow(uid, price);
   };
 
   // SELL
   const handleSellClick = () => {
-    console.log("SELL CLICKED:", uid, price);
     generalContext.openSellWindow(uid, price);
   };
 

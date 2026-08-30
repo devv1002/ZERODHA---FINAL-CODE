@@ -46,8 +46,6 @@ const BuyActionWindow = ({ uid, price }) => {
       generalContext.refreshData();
 
     } catch (error) {
-      console.log("Error placing buy order:", error);
-
       alert(
         error.response?.data?.message ||
         "Failed to place order!"
